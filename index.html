@@ -1,21 +1,41 @@
-<link rel="stylesheet" href="style.css" />
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Russia Time Zone Clock Puzzle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <h1>Russia Time Zone Clock Puzzle</h1>
+      <div class="subtitle">Adjust all Russian clocks to match the time in Thailand.</div>
+    </div>
+    <div class="th-time"><span>Thailand</span><b>18:00</b></div>
+  </header>
 
+  <div class="clocks" id="clocks"></div>
 
-<h1>Russia Time Zone Clock Puzzle</h1>
-<div class="subtitle">
-  Thailand time is <b>18:00</b>. Adjust all Russian clocks correctly.
+  <div class="buttons" id="buttons"></div>
+
+  <div class="actions">
+    <button class="check" onclick="checkAnswer()">ตรวจเช็ค</button>
+    <button class="reset" onclick="resetGame()">Reset</button>
+  </div>
+
+  <div class="status" id="status"></div>
+  <div class="small" id="moves"></div>
+
+  <!-- ลบก่อน deploy: เริ่ม -->
+  <div class="debug-box" id="debugBox"></div>
+  <!-- ลบก่อน deploy: จบ -->
 </div>
 
-<div class="clocks" id="clocks"></div>
-<div class="buttons" id="buttons"></div>
-
-<button class="reset" onclick="resetGame()">Reset</button>
-
-<div class="status" id="status"></div>
-<div class="small" id="moves"></div>
-
-<!-- ลบก่อน deploy: เริ่ม -->
-<div class="debug-box" id="debugBox"></div>
-<!-- ลบก่อน deploy: จบ -->
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

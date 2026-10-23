@@ -19,10 +19,12 @@ const targetTimes = zones.map(z =>
   (TH_TIME + (z.offset - TH_OFFSET) + 24) % 24
 );
 
-const START_TIMES = [8, 5, 8, 10, 9, 7, 11, 15, 15, 19, 20];
+const START_TIMES = Array(11).fill(6); // ทุกเรือนเริ่มที่ 6 AM
 
 let currentTimes = [...START_TIMES];
 let moveCount = 0;
+let checked = false;
+let hoverClocks = [];
 
 const actions = [
   { name: "A", clocks: [0] },
@@ -34,8 +36,8 @@ const actions = [
   { name: "F", clocks: [7,8] },
   { name: "G", clocks: [9,10] },
 
-  { name: "H", clocks: [0,3,6] },
-  { name: "I", clocks: [1,4,7] },
+  { name: "H", clocks: [0,6] },
+  { name: "I", clocks: [1,4,7,10] },
   { name: "J", clocks: [2,5,8] }
 ];
 
@@ -55,20 +57,20 @@ const buttonStyles = [
 /* ===============================
    ลบก่อน deploy: เริ่ม
 ================================ */
-const DEBUG_MODE = new URLSearchParams(window.location.search).get("debug") === "1";
+/*const DEBUG_MODE = new URLSearchParams(window.location.search).get("debug") === "0";
 
 const SECRET_SOLUTION = `
 เฉลย:
-A x3
-B x5
-C x2
-D x4
-E x6
-F x1
-G x3
-H x2
-I x4
-J x5
+A x4
+B x7
+C x7
+D x10
+E x10
+F x13
+G x16
+H x3
+I x1
+J x2
 `;
 
 if (DEBUG_MODE) {
@@ -76,7 +78,7 @@ if (DEBUG_MODE) {
   const box = document.getElementById("debugBox");
   box.style.display = "block";
   box.innerHTML = SECRET_SOLUTION.replaceAll("\n", "<br>");
-}
+}/*
 /* ===============================
    ลบก่อน deploy: จบ
 ================================ */
@@ -102,21 +104,21 @@ function renderClock(hour) {
     const y2 = 50 + 39 * Math.sin(angle);
 
     return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-      stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/>`;
+      stroke="#2b2f3a" stroke-width="2.6" stroke-linecap="round"/>`;
   }).join("");
 
   return `
     <svg width="125" height="125" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="43" fill="#e2e8f0" stroke="#020617" stroke-width="4"></circle>
+      <circle cx="50" cy="50" r="43" fill="#f3ead6" stroke="#d9a441" stroke-width="5"></circle>
       ${ticks}
 
       <line x1="50" y1="50" x2="${minuteX}" y2="${minuteY}"
-        stroke="#2563eb" stroke-width="3" stroke-linecap="round"></line>
+        stroke="#2b2f3a" stroke-width="3" stroke-linecap="round"></line>
 
       <line x1="50" y1="50" x2="${hourX}" y2="${hourY}"
-        stroke="#ef4444" stroke-width="4.5" stroke-linecap="round"></line>
+        stroke="#c8402e" stroke-width="4.5" stroke-linecap="round"></line>
 
-      <circle cx="50" cy="50" r="4" fill="#020617"></circle>
+      <circle cx="50" cy="50" r="4" fill="#2b2f3a"></circle>
     </svg>
   `;
 }
@@ -127,10 +129,10 @@ function renderClocks() {
 
   zones.forEach((z, i) => {
     const div = document.createElement("div");
-    div.className = "clock-card" + (currentTimes[i] === targetTimes[i] ? " correct" : "");
+    div.className = "clock-card" + (checked && currentTimes[i] === targetTimes[i] ? " correct" : "") + (hoverClocks.includes(i) ? " hit" : "");
 
     div.innerHTML = `
-      <div class="city">${i + 1}. ${z.city}</div>
+      <div class="city">${z.city}</div>
       ${renderClock(currentTimes[i])}
       <div class="ampm-label">${currentTimes[i] < 12 ? "AM" : "PM"}</div>
     `;
@@ -154,9 +156,18 @@ function renderButtons() {
     // 🔥 ใส่ตัวอักษร
     btn.innerHTML = `<div class="btn-label">${a.name}</div>`;
 
+    btn.setAttribute("aria-label", "Button " + a.name);
     btn.onclick = () => press(a);
 
-    el.appendChild(btn);
+    // ไฮไลต์นาฬิกาที่ปุ่มนี้จะเปลี่ยน
+    //const on = () => { hoverClocks = a.clocks; renderClocks(); };
+    //const off = () => { hoverClocks = []; renderClocks(); };
+    //btn.addEventListener("mouseenter", on);
+    //btn.addEventListener("mouseleave", off);
+    //btn.addEventListener("focus", on);
+    //btn.addEventListener("blur", off);
+
+    el.appendChild(btn);//
   });
 }
 
@@ -166,6 +177,7 @@ function press(action) {
   });
 
   moveCount++;
+  checked = false;
   update();
 }
 
@@ -177,16 +189,36 @@ function update() {
   renderClocks();
   document.getElementById("moves").textContent = "Moves: " + moveCount;
 
-  document.getElementById("status").textContent = checkWin()
-    ? "🎉 Completed!"
+  document.getElementById("status").textContent = checked && checkWin()
+    ? "🎉 Completed! password is notimetolose"
     : "Solve the puzzle...";
+}
+
+function checkAnswer() {
+  checked = true;
+  update();
 }
 
 function resetGame() {
   currentTimes = [...START_TIMES];
   moveCount = 0;
+  checked = false;
   update();
 }
 
 renderButtons();
 update();
+
+/* ===============================
+   เฉลยทาง Console
+   เปิด Console (F12) แล้วพิมพ์: solution()
+================================ */
+/*window.solution = function () {
+  const answer = {
+    A: 4, B: 7, C: 7, D: 10, E: 10,
+    F: 13, G: 16, H: 3, I: 1, J: 2
+  };
+  console.table(answer);
+  return "กดปุ่มตามจำนวนครั้งในตารางด้านบน";
+};
+console.log("💡 พิมพ์ solution() เพื่อดูเฉลย")*/
